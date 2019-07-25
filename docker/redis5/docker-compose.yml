@@ -1,0 +1,56 @@
+version: '3.3'
+
+services:
+    redis_master:
+        image: redis:5.0.5-alpine
+        networks:
+          redis5:
+            ipv4_address: 172.21.0.5
+        command: redis-server --requirepass abc --masterauth abc
+
+    redis_slave:
+        image: redis:5.0.5-alpine
+        networks:
+          redis5:
+            ipv4_address: 172.21.0.10
+        command: redis-server --requirepass abc --masterauth abc --slaveof redis_master 6379
+        depends_on:
+            - redis_master
+
+    sentinel1:        
+        image: pgeraghty/redis-sentinel:5.0.5
+        networks:
+          redis5:
+            ipv4_address: 172.21.0.15
+        environment:
+            - MASTER_NAME=the-master
+            - QUORUM=1
+            - MASTER=redis_master
+            - DOWN_AFTER=5000
+            - FAILOVER_TIMEOUT=60000
+            - AUTH_PASS=abc
+            - REQUIRE_PASS=abcd
+        depends_on:
+            - redis_master
+    
+    sentinel2:        
+        image: pgeraghty/redis-sentinel:5.0.5
+        networks:
+          redis5:
+            ipv4_address: 172.21.0.20
+        environment:
+            - MASTER_NAME=the-master
+            - QUORUM=1
+            - MASTER=redis_master
+            - DOWN_AFTER=5000
+            - FAILOVER_TIMEOUT=60000
+            - AUTH_PASS=abc
+            - REQUIRE_PASS=abcd
+        depends_on:
+            - redis_master
+
+networks:
+  redis5:
+    ipam:
+      config:
+        - subnet: 172.21.0.0/24

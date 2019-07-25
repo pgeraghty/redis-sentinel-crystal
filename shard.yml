@@ -1,0 +1,11 @@
+name: redis-sentinel
+version: 2.2.1
+
+authors:
+  - Paul Geraghty <muse@appsthatcould.be>
+
+dependencies:
+  redis:
+    github: stefanwille/crystal-redis
+
+license: MIT

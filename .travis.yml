@@ -1,0 +1,15 @@
+language: crystal
+
+services:
+  - docker
+
+# TODO check against various Redis versions
+
+before_install:
+  - docker-compose -f docker/redis4/docker-compose.yml up -d
+
+script:  
+  - crystal spec
+
+  # Uncomment the following if you'd like to check code formatting
+  # - crystal tool format --check
