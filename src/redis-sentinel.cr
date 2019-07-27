@@ -21,24 +21,6 @@ class Redis
   private def ensure_connection
     if @connection
       # Already connected, nothing to be done.
-
-      # ported from Redis Ruby Redis#check
-      # Check the instance is really of the role we are looking for.
-      # We can't assume the command is supported since it was introduced
-      # recently and this client should work with old stuff.
-      begin
-        strategy = Redis::Strategy::SingleStatement.new(@connection.not_nil!)
-        role = strategy.command(["role"]).as(Array)[0]
-      rescue Redis::Error
-        # Assume the test is passed if we can't get a reply from ROLE...
-        role = @role
-      end
-
-      if role != @role
-        @connection.not_nil!.close
-        raise ConnectionError.new("Instance role mismatch. Expected #{@role}, got #{role}.")
-      end
-
       return
     end
 
@@ -67,10 +49,34 @@ class Redis
         # revert to vanilla standalone Redis behaviour
         Connection.new(@host, @port, @unixsocket, @ssl_context, @dns_timeout, @connect_timeout, @command_timeout)
       end
-
+    
     @strategy = Redis::Strategy::SingleStatement.new(@connection.not_nil!)
-    strategy.command(["AUTH", @password]) if @password
-    strategy.command(["SELECT", @database.to_s]) if @database
+        
+    if @strategy
+      @strategy.not_nil!.command(["AUTH", @password]) if @password
+      @strategy.not_nil!.command(["SELECT", @database.to_s]) if @database
+    else
+      raise ConnectionError.new("Invalid strategy")
+    end
+
+    if @sentinels
+      # ported from Ruby Redis' Redis::Client::Connector::Sentinel#check
+      # Check the instance is really of the role we are looking for.
+      # We can't assume the command is supported since it was introduced
+      # recently and this client should work with old stuff.
+      begin
+        role = @strategy.not_nil!.command(["role"]).as(Array)[0]
+      rescue Redis::Error
+        # Assume the test is passed if we can't get a reply from ROLE...
+        role = @role
+      end
+
+      if role != @role
+        @connection.not_nil!.close
+        raise ConnectionError.new("Instance role mismatch. Expected #{@role}, got #{role}.")
+      end
+    end
+
   end
 
   # finds appropriate Redis instance via Sentinel
