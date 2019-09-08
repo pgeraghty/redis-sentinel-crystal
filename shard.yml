@@ -6,6 +6,8 @@ authors:
 
 dependencies:
   redis:
-    github: stefanwille/crystal-redis
+    github: pgeraghty/crystal-redis
+    branch: pipeline_multi
+    version: ~> 2.2.1
 
 license: MIT
