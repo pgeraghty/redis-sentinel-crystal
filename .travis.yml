@@ -2,10 +2,14 @@ language: crystal
 
 services:
   - docker
+  - redis-server
 
 env:
-  - REDIS_VERSION=redis4
-  - REDIS_VERSION=redis5 REDIS_SENTINEL_TEST_V5_AUTH=true
+  global:
+    - TRAVIS_CI_BUILD=true
+  matrix:
+    - REDIS_VERSION=redis4
+    - REDIS_VERSION=redis5 REDIS_SENTINEL_TEST_V5_AUTH=true
 
 # TODO check against a greater range of Redis versions
 
