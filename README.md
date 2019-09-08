@@ -1,4 +1,6 @@
-# redis-sentinel
+# Redis Sentinel for Crystal
+
+[![Build Status](https://travis-ci.com/pgeraghty/redis-sentinel-crystal.svg?branch=master)](https://travis-ci.com/pgeraghty/redis-sentinel-crystal)
 
 Basic Redis Sentinel support for Crystal. Ported directly from the [Ruby Redis gem](https://github.com/redis/redis-rb).
 
