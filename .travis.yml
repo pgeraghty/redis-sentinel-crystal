@@ -3,12 +3,14 @@ language: crystal
 services:
   - docker
 
-# TODO check against various Redis versions
+env:
+  - REDIS_VERSION=redis4
+  - REDIS_VERSION=redis5 REDIS_SENTINEL_TEST_V5_AUTH=true
 
-before_install:
-  - docker-compose -f docker/redis4/docker-compose.yml up -d
+# TODO check against a greater range of Redis versions
 
-script:  
+script:
+  - docker-compose -f docker/$REDIS_VERSION/docker-compose.yml up -d
   - crystal spec
 
   # Uncomment the following if you'd like to check code formatting
