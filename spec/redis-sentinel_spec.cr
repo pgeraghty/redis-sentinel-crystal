@@ -1,33 +1,27 @@
 require "./spec_helper"
 
-DOCKER_CLUSTER_ARGS = 
-  if ENV["REDIS_SENTINEL_TEST_V5_AUTH"]? == "true"
-    {host: "the-master", password: "abc", sentinels: [{:host => "172.21.0.15", :port => 26379, :password => "abcd"}, {:host => "172.21.0.20", :port => 26379, :password => "abcd"}]}
-  else
-    {host: "the-master", password: "abc", sentinels: [{:host => "172.22.0.15", :port => 26379}, {:host => "172.22.0.20", :port => 26379}]}
-  end
-
-SENTINEL_TEST_REDIS_KEY = "redis_sentinel_test_crystal_7sbSHjpL4p6gTpMw"
-SENTINEL_TEST_STRING = "C4zj3rE2cpbGHwUawjndyrsYfqRrCC25"
+rnd = Random.new
+redis_key = "redis_sentinel_test_crystal_#{rnd.hex}"
+test_string = "C4zj3rE2cpbGHwUawjndyrsYfqRrCC25_#{rnd.hex}"
 
 describe Redis do
   # TODO: Write further tests
   
   it "can connect to sentinels" do
-    r = Redis.new **DOCKER_CLUSTER_ARGS
+    redis = Redis.new **DOCKER_CLUSTER_ARGS
 
-    r.set SENTINEL_TEST_REDIS_KEY, SENTINEL_TEST_STRING
-    value = r.get SENTINEL_TEST_REDIS_KEY
+    redis.set redis_key, test_string
+    value = redis.get redis_key
 
-    value == SENTINEL_TEST_STRING
+    value.should eq test_string
   end
 
   it "does not interfere with local Redis" do
-    r = Redis.new
+    redis = Redis.new
     
-    value = r.get SENTINEL_TEST_REDIS_KEY
+    value = redis.get redis_key
 
-    value == nil
+    value.should be_nil
   end
 end
 
