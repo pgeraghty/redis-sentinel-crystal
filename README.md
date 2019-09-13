@@ -42,14 +42,7 @@ r = Redis.new host: "the-master", password: "abc", sentinels: [{:host => "172.21
 
 Testing and development require a functional Redis Sentinel configuration; I have provided [Docker Compose](https://docs.docker.com/compose/) files to establish these for Redis [4](docker/redis4/docker-compose.yml) or [5](docker/redis5/docker-compose.yml). Both set up a separate static network so that IP addresses are pre-established.
 
-TODO experiment with SSL configuration, similar to the following from Ruby:
-```ruby
-:ssl_params => {
-  :ca_file => "/path/to/ca.crt",
-  :cert    => OpenSSL::X509::Certificate.new(File.read("client.crt")),
-  :key     => OpenSSL::PKey::RSA.new(File.read("client.key"))
-}
-```
+TODO experiment with SSL configuration in conjunction with [Client.from_hash](https://crystal-lang.org/api/0.30.1/OpenSSL/SSL/Context/Client.html#from_hash(params):self-class-method).
 
 <!-- TODO: Write further development instructions here -->
 
